@@ -95,11 +95,12 @@ class MassSpringDamper:
         self.position = 0
         self.velocity = 0
 
-    def update(self, force, dt,current_time):
+    def update(self, force, dt, current_time):
         if current_time >= 5.0:
             self.mass = 20.0
-            self.spring_constant=3.0
-        acceleration = (force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
+            self.spring_constant = 3.0
+        acceleration = (
+                                   force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
         self.velocity += acceleration * dt
         self.position += self.velocity * dt
         return self.position
@@ -109,8 +110,8 @@ def calculate_quality_indices(time, trajectory, response):
     error = trajectory - response
     IAE = np.trapz(np.abs(error), time)
     ITAE = np.trapz(time * np.abs(error), time)
-    ISE = np.trapz(error**2, time)
-    ITSE = np.trapz(time * error**2, time)
+    ISE = np.trapz(error ** 2, time)
+    ITSE = np.trapz(time * error ** 2, time)
     return IAE, ITAE, ISE, ITSE
 
 
@@ -139,14 +140,20 @@ def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid,
     axs[2].set_xlabel('Time (s)')
     axs[2].set_ylabel('Position')
     axs[2].legend()
+    axs[2].text(0.02, 0.95, 'Initial Params:\nMass: 1.0\nSpring: 1.0\nDamping: 0.3', transform=axs[2].transAxes,
+                fontsize=9,
+                verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
+    axs[2].text(0.75, 0.95, 'Changed Params (at t=5s):\nMass: 20.0\nSpring: 3.0', transform=axs[2].transAxes,
+                fontsize=9,
+                verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
     quality_indices = ['IAE', 'ITAE', 'ISE', 'ITSE']
     pid_indices = [IAE_pid, ITAE_pid, ISE_pid, ITSE_pid]
     adrc_indices = [IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc]
     x = np.arange(len(quality_indices))
     width = 0.35
-    axs[3].bar(x - width / 2, pid_indices, width, label='PID')
-    axs[3].bar(x + width / 2, adrc_indices, width, label='ADRC')
+    bars_pid = axs[3].bar(x - width / 2, pid_indices, width, label='PID')
+    bars_adrc = axs[3].bar(x + width / 2, adrc_indices, width, label='ADRC')
     axs[3].set_title('Quality Indices')
     axs[3].set_xlabel('Index')
     axs[3].set_ylabel('Value')
@@ -154,8 +161,16 @@ def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid,
     axs[3].set_xticklabels(quality_indices)
     axs[3].legend()
 
-    # Animation figure
+    for bar in bars_pid:
+        yval = bar.get_height()
+        axs[3].text(bar.get_x() + bar.get_width() / 2, yval + 0.05, f'{yval:.2f}', ha='center', va='bottom')
+    for bar in bars_adrc:
+        yval = bar.get_height()
+        axs[3].text(bar.get_x() + bar.get_width() / 2, yval + 0.05, f'{yval:.2f}', ha='center', va='bottom')
+
     plt.tight_layout()
+
+    # Animation figure
     fig_anim, ax_anim = plt.subplots(figsize=(12, 6))
     ax_anim.set_xlim(-2, 2)
     ax_anim.set_ylim(-0.3, 0.3)
