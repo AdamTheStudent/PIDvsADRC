@@ -2,6 +2,7 @@ import numpy as np
 from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results,\
     calculate_quality_indices
 
+
 def main():
     # Configuration parameters
     dt = 0.01
