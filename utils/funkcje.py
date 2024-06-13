@@ -3,11 +3,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def generate_trajectory(t, option):
     if option == 'sin':
         return np.sin(t)
     elif option == 'const':
-        return np.ones_like(t)
+        return np.full_like(t, 1.0)
     elif option == 'poly':
         # TODO
         coefficients = [1, -2, 1]

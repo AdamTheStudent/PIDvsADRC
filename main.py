@@ -10,12 +10,13 @@ def main():
 
     # Pick trajectory
     # trajectory = generate_trajectory(t, 'sin')  # sinus
+    # Generate trajectory
     trajectory = generate_trajectory(t, 'const')
     # trajectory = generate_trajectory(t, 'poly')  # polynomial trajectory
     # trajectory = generate_trajectory(t, 'triangle')  # triangle trajectory
 
     # Initialize controllers and system
-    pid = PIDController(kp=0.0, ki=0.0, kd=0.00)
+    pid = PIDController(kp=5.0, ki=1.5, kd=0.5)  # Optymalizowane parametry PID
     adrc = ADRCController(beta1=30, beta2=300, beta3=1000, k1=50, k2=2, dt=dt)
 
     # Create separate systems for PID and ADRC
