@@ -1,7 +1,6 @@
 # main.py
 import numpy as np
-from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results
-
+from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results, calculate_quality_indices
 
 def main():
     # Simulation parameters
@@ -18,7 +17,6 @@ def main():
     # Initialize controllers and system
     pid = PIDController(kp=5.0, ki=1.5, kd=0.5)  # Optymalizowane parametry PID
     adrc = ADRCController(beta1=30, beta2=300, beta3=1000, k1=50, k2=2, dt=dt)
-
 
     # Create separate systems for PID and ADRC
     system_pid = MassSpringDamper(mass=1.0, spring_constant=1.0, damping_coefficient=0.3)
@@ -44,9 +42,16 @@ def main():
         pid_output[i] = pid_control
         adrc_output[i] = adrc_control
 
-    # Plot results
-    plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc,dt=dt)
+    # Calculate quality indices
+    IAE_pid, ITAE_pid, ISE_pid, ITSE_pid = calculate_quality_indices(t, trajectory, system_response_pid)
+    IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc = calculate_quality_indices(t, trajectory, system_response_adrc)
 
+    # Print quality indices
+    print(f'PID Controller Quality Indices:\n IAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
+    print(f'ADRC Controller Quality Indices:\n IAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
+
+    # Plot results
+    plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt)
 
 if __name__ == '__main__':
     main()
