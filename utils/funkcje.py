@@ -3,26 +3,21 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 
-def generate_trajectory(t, option):
+def generate_trajectory(t, option, const_value=1.0, poly_coefficients=[1, -2, 1], period=2, amplitude=1):
     if option == 'sin':
         return np.sin(t)
     elif option == 'const':
-        return np.full_like(t, 1.0)
+        return np.full_like(t, const_value)
     elif option == 'poly':
-        coefficients = [1, -2, 1]
         trajectory = np.zeros_like(t)
-        n = len(coefficients) - 1
-        for i, coef in enumerate(coefficients):
+        n = len(poly_coefficients) - 1
+        for i, coef in enumerate(poly_coefficients):
             trajectory += coef * t ** (n - i)
         return trajectory
     elif option == 'triangle':
-        period = 2
-        amplitude = 1
         trajectory = amplitude * (2 * np.abs(2 * (t / period - np.floor(t / period + 0.5))) - 1)
         return trajectory
     else:
-        period = 2
-        amplitude = 1
         trajectory = amplitude * (2 * np.abs(2 * (t / period - np.floor(t / period + 0.5))) - 1)
         return trajectory
 
@@ -96,9 +91,6 @@ class MassSpringDamper:
         self.velocity = 0
 
     def update(self, force, dt, current_time):
-        if current_time >= 5.0:
-            self.mass = 20.0
-            self.spring_constant = 3.0
         acceleration = (
                                    force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
         self.velocity += acceleration * dt
