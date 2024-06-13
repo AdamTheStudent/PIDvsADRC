@@ -7,12 +7,10 @@ def generate_trajectory(t, option):
     if option == 'sin':
         return np.sin(t)
     elif option == 'const':
-        # Create an array filled with 1.0 for the first 5 seconds, then 0.0
-        trajectory = np.where(t < 5.0, 1.0, 0.0)
-        return trajectory
+        return np.ones_like(t)
     elif option == 'poly':
-        #TODO
-        coefficients = [1,-2, 1]
+        # TODO
+        coefficients = [1, -2, 1]
         trajectory = np.zeros_like(t)
         n = len(coefficients) - 1
         for i, coef in enumerate(coefficients):
@@ -48,17 +46,35 @@ class PIDController:
         return output
 
 
-class ADRCController:
-    def __init__(self, beta1, beta2, beta3):
+class ESO:
+    def __init__(self, beta1, beta2, beta3, dt):
         self.beta1 = beta1
         self.beta2 = beta2
         self.beta3 = beta3
+        self.dt = dt
+        self.x1_hat = 0.0
+        self.x2_hat = 0.0
+        self.x3_hat = 0.0
+
+    def update(self, measured_value):
+        error = measured_value - self.x1_hat
+        self.x1_hat += self.dt * (self.x2_hat + self.beta1 * error)
+        self.x2_hat += self.dt * (self.x3_hat + self.beta2 * error)
+        self.x3_hat += self.dt * (self.beta3 * error)
+        return self.x1_hat, self.x2_hat, self.x3_hat
+
+
+class ADRCController:
+    def __init__(self, beta1, beta2, beta3, k1, k2, dt):
+        self.eso = ESO(beta1, beta2, beta3, dt)
+        self.k1 = k1
+        self.k2 = k2
 
     def calculate(self, setpoint, measured_value, dt):
-        # Placeholder: Simple PD control for demonstration
-        error = setpoint - measured_value
-        output = self.beta1 * error - self.beta2 * (measured_value / dt)
-        return output
+        x1_hat, x2_hat, x3_hat = self.eso.update(measured_value)
+        error = setpoint - x1_hat
+        control_signal = self.k1 * error - self.k2 * x2_hat - x3_hat
+        return control_signal
 
 
 class MassSpringDamper:
@@ -70,14 +86,13 @@ class MassSpringDamper:
         self.velocity = 0
 
     def update(self, force, dt):
-        acceleration = (
-                                   force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
+        acceleration = (force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
         self.velocity += acceleration * dt
         self.position += self.velocity * dt
         return self.position
 
 
-def plot_results(time, trajectory, pid_output, adrc_output, system_response):
+def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc):
     plt.figure(figsize=(12, 8))
 
     plt.subplot(3, 1, 1)
@@ -96,7 +111,8 @@ def plot_results(time, trajectory, pid_output, adrc_output, system_response):
     plt.legend()
 
     plt.subplot(3, 1, 3)
-    plt.plot(time, system_response, label='System Response')
+    plt.plot(time, system_response_pid, label='System Response (PID)')
+    plt.plot(time, system_response_adrc, label='System Response (ADRC)')
     plt.title('System Response')
     plt.xlabel('Time (s)')
     plt.ylabel('Position')

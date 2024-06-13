@@ -8,40 +8,42 @@ def main():
     dt = 0.01
     t = np.arange(0, 10, dt)
 
-    # Pick  trajectory
-    trajectory = generate_trajectory(t,'sin') #sinus
-    trajectory = generate_trajectory(t,'const') #5 sek contsant 1.0 -> 5 sek 0.0
-    # trajectory = generate_trajectory(t,'poly')# polynomial trajectory
-    # trajectory = generate_trajectory(t, 'triangle') #triangle trajectory
+    # Pick trajectory
+    # trajectory = generate_trajectory(t, 'sin')  # sinus
+    trajectory = generate_trajectory(t, 'const')
+    # trajectory = generate_trajectory(t, 'poly')  # polynomial trajectory
+    # trajectory = generate_trajectory(t, 'triangle')  # triangle trajectory
 
     # Initialize controllers and system
-    pid = PIDController(kp=3.0, ki=10.1, kd=1.01)
-    adrc = ADRCController(beta1=1.0, beta2=0.5, beta3=0.1)
-    system = MassSpringDamper(mass=1.0, spring_constant=1.0, damping_coefficient=0.2)
+    pid = PIDController(kp=0.0, ki=0.0, kd=0.00)
+    adrc = ADRCController(beta1=30, beta2=300, beta3=1000, k1=50, k2=2, dt=dt)
+
+    # Create separate systems for PID and ADRC
+    system_pid = MassSpringDamper(mass=1.0, spring_constant=1.0, damping_coefficient=0.2)
+    system_adrc = MassSpringDamper(mass=1.0, spring_constant=1.0, damping_coefficient=0.2)
 
     # Prepare arrays to store results
     pid_output = np.zeros_like(t)
     adrc_output = np.zeros_like(t)
-    system_response = np.zeros_like(t)
+    system_response_pid = np.zeros_like(t)
+    system_response_adrc = np.zeros_like(t)
 
     # Simulation loop
     for i in range(1, len(t)):
         # Get control signals
-        pid_control = pid.calculate(trajectory[i], system.position, dt)
-        adrc_control = adrc.calculate(trajectory[i], system.position, dt)
-
-        # Use one of the controllers to update the system (alternatively, simulate both)
-        force = pid_control  # or adrc_control
+        pid_control = pid.calculate(trajectory[i], system_pid.position, dt)
+        adrc_control = adrc.calculate(trajectory[i], system_adrc.position, dt)
 
         # Update system dynamics
-        system_response[i] = system.update(force, dt)
+        system_response_pid[i] = system_pid.update(pid_control, dt)
+        system_response_adrc[i] = system_adrc.update(adrc_control, dt)
 
         # Store control outputs
         pid_output[i] = pid_control
         adrc_output[i] = adrc_control
 
     # Plot results
-    plot_results(t, trajectory, pid_output, adrc_output, system_response)
+    plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc)
 
 
 if __name__ == '__main__':
