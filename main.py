@@ -1,5 +1,6 @@
 import numpy as np
-from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results, calculate_quality_indices
+from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results,\
+    calculate_quality_indices
 
 
 def main():
@@ -32,7 +33,8 @@ def main():
     # ==================================================================================================================
 
     # Generate trajectory
-    trajectory = generate_trajectory(t, trajectory_type, const_value, poly_coefficients, triangle_period, triangle_amplitude)
+    trajectory = generate_trajectory(t, trajectory_type, const_value, poly_coefficients, triangle_period,
+                                     triangle_amplitude)
 
     # Initialize controllers
     pid = PIDController(**pid_params)
@@ -75,8 +77,10 @@ def main():
     IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc = calculate_quality_indices(t, trajectory, system_response_adrc)
 
     # Print quality indices
-    print(f'PID Controller Quality Indices:\n IAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
-    print(f'ADRC Controller Quality Indices:\n IAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
+    print(f'PID Controller Quality Indices:\n'
+          f'IAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
+    print(f'ADRC Controller Quality Indices:\n'
+          f'IAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
 
     # Plot results
     plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt)
