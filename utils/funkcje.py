@@ -94,7 +94,10 @@ class MassSpringDamper:
         self.position = 0
         self.velocity = 0
 
-    def update(self, force, dt):
+    def update(self, force, dt,current_time):
+        if current_time >= 5.0:
+            self.mass = 20.0
+            self.spring_constant=3.0
         acceleration = (force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
         self.velocity += acceleration * dt
         self.position += self.velocity * dt

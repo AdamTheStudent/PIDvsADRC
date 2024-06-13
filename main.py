@@ -35,8 +35,8 @@ def main():
         adrc_control = adrc.calculate(trajectory[i], system_adrc.position, dt)
 
         # Update system dynamics
-        system_response_pid[i] = system_pid.update(pid_control, dt)
-        system_response_adrc[i] = system_adrc.update(adrc_control, dt)
+        system_response_pid[i] = system_pid.update(pid_control, dt,t[i])
+        system_response_adrc[i] = system_adrc.update(adrc_control, dt,t[i])
 
         # Store control outputs
         pid_output[i] = pid_control
