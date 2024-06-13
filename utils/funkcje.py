@@ -3,11 +3,32 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
-def generate_trajectory(t):
-    # Example: Sine wave trajectory
-    trajectory = np.sin(t)
-    return trajectory
+def generate_trajectory(t, option):
+    if option == 'sin':
+        return np.sin(t)
+    elif option == 'const':
+        # Create an array filled with 1.0 for the first 5 seconds, then 0.0
+        trajectory = np.where(t < 5.0, 1.0, 0.0)
+        return trajectory
+    elif option == 'poly':
+        #TODO
+        coefficients = [1,-2, 1]
+        trajectory = np.zeros_like(t)
+        n = len(coefficients) - 1
+        for i, coef in enumerate(coefficients):
+            trajectory += coef * t ** (n - i)
+        return trajectory
+    elif option == 'triangle':
+        period = 2
+        amplitude = 1
+        trajectory = amplitude * (2 * np.abs(2 * (t / period - np.floor(t / period + 0.5))) - 1)
+        return trajectory
+    else:
+        # Default to triangle trajectory
+        period = 2
+        amplitude = 1
+        trajectory = amplitude * (2 * np.abs(2 * (t / period - np.floor(t / period + 0.5))) - 1)
+        return trajectory
 
 
 class PIDController:
