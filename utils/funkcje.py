@@ -1,4 +1,8 @@
+# funkcje.py
+
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 def generate_trajectory(t):
     # Example: Sine wave trajectory
@@ -23,8 +27,6 @@ class PIDController:
         return output
 
 
-# ADRC implementation is more complex and usually problem-specific
-# Here is a simple placeholder implementation
 class ADRCController:
     def __init__(self, beta1, beta2, beta3):
         self.beta1 = beta1
@@ -52,9 +54,6 @@ class MassSpringDamper:
         self.velocity += acceleration * dt
         self.position += self.velocity * dt
         return self.position
-
-
-import matplotlib.pyplot as plt
 
 
 def plot_results(time, trajectory, pid_output, adrc_output, system_response):

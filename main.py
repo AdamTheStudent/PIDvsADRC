@@ -1,4 +1,8 @@
-import .utils.funkcje
+# main.py
+import numpy as np
+from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results
+
+
 def main():
     # Simulation parameters
     dt = 0.01
