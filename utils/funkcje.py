@@ -2,7 +2,7 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-
+from matplotlib.animation import FuncAnimation
 
 def generate_trajectory(t, option):
     if option == 'sin':
@@ -10,7 +10,6 @@ def generate_trajectory(t, option):
     elif option == 'const':
         return np.full_like(t, 1.0)
     elif option == 'poly':
-        # TODO
         coefficients = [1, -2, 1]
         trajectory = np.zeros_like(t)
         n = len(coefficients) - 1
@@ -37,13 +36,18 @@ class PIDController:
         self.kd = kd
         self.integral = 0
         self.previous_error = 0
-
+        self.min = -10
+        self.max = 10
     def calculate(self, setpoint, measured_value, dt):
         error = setpoint - measured_value
         self.integral += error * dt
         derivative = (error - self.previous_error) / dt
         output = self.kp * error + self.ki * self.integral + self.kd * derivative
         self.previous_error = error
+        if output > self.max:
+            output = self.max
+        elif output < self.min:
+            output = self.min
         return output
 
 
@@ -70,11 +74,17 @@ class ADRCController:
         self.eso = ESO(beta1, beta2, beta3, dt)
         self.k1 = k1
         self.k2 = k2
-
+        self.min = -10
+        self.max = 10
     def calculate(self, setpoint, measured_value, dt):
+
         x1_hat, x2_hat, x3_hat = self.eso.update(measured_value)
         error = setpoint - x1_hat
         control_signal = self.k1 * error - self.k2 * x2_hat - x3_hat
+        if control_signal > self.max:
+            control_signal = self.max
+        elif control_signal < self.min:
+            control_signal = self.min
         return control_signal
 
 
@@ -93,31 +103,50 @@ class MassSpringDamper:
         return self.position
 
 
-def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc):
-    plt.figure(figsize=(12, 8))
+def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt):
+    # Static plots figure
+    fig_static, axs = plt.subplots(3, 1, figsize=(12, 8))
 
-    plt.subplot(3, 1, 1)
-    plt.plot(time, trajectory, label='Desired Trajectory')
-    plt.title('Desired Trajectory')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Position')
-    plt.legend()
+    axs[0].plot(time, trajectory, label='Desired Trajectory')
+    axs[0].set_title('Desired Trajectory')
+    axs[0].set_xlabel('Time (s)')
+    axs[0].set_ylabel('Position')
+    axs[0].legend()
 
-    plt.subplot(3, 1, 2)
-    plt.plot(time, pid_output, label='PID Output')
-    plt.plot(time, adrc_output, label='ADRC Output')
-    plt.title('Control Signals')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Control Signal')
-    plt.legend()
+    axs[1].plot(time, pid_output, label='PID Output')
+    axs[1].plot(time, adrc_output, label='ADRC Output')
+    axs[1].set_title('Control Signals')
+    axs[1].set_xlabel('Time (s)')
+    axs[1].set_ylabel('Control Signal')
+    axs[1].legend()
 
-    plt.subplot(3, 1, 3)
-    plt.plot(time, system_response_pid, label='System Response (PID)')
-    plt.plot(time, system_response_adrc, label='System Response (ADRC)')
-    plt.title('System Response')
-    plt.xlabel('Time (s)')
-    plt.ylabel('Position')
-    plt.legend()
+    axs[2].plot(time, system_response_pid, label='System Response (PID)')
+    axs[2].plot(time, system_response_adrc, label='System Response (ADRC)')
+    axs[2].set_title('System Response')
+    axs[2].set_xlabel('Time (s)')
+    axs[2].set_ylabel('Position')
+    axs[2].legend()
 
     plt.tight_layout()
+
+    # Animation figure
+    fig_anim, ax_anim = plt.subplots(figsize=(12, 6))
+    ax_anim.set_xlim(-2, 2)
+    ax_anim.set_ylim(-0.3,0.3)
+    mass_pid, = ax_anim.plot([], [], 'bo', label='PID Response', markersize=50)
+    mass_adrc, = ax_anim.plot([], [], 'ro', label='ADRC Response', markersize=50)
+    ax_anim.legend()
+
+    def init():
+        mass_pid.set_data([], [])
+        mass_adrc.set_data([], [])
+        return mass_pid, mass_adrc
+
+    def update(frame):
+        mass_pid.set_data(system_response_pid[frame], 0)
+        mass_adrc.set_data(system_response_adrc[frame], 0)
+        return mass_pid, mass_adrc
+
+    ani = FuncAnimation(fig_anim, update, frames=len(time), init_func=init, blit=True, interval=1000 * dt)
+
     plt.show()
