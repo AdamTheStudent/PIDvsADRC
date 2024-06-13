@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
+
 def generate_trajectory(t, option):
     if option == 'sin':
         return np.sin(t)

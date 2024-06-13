@@ -1,6 +1,6 @@
-# main.py
 import numpy as np
 from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results, calculate_quality_indices
+
 
 def main():
     # Simulation parameters
@@ -8,9 +8,9 @@ def main():
     t = np.arange(0, 10, dt)
 
     # choose trajectory
-    # trajectory = generate_trajectory(t, 'sin')  # sinus
+    trajectory = generate_trajectory(t, 'sin')  # sinus
     # Generate trajectory
-    trajectory = generate_trajectory(t, 'const')
+    # trajectory = generate_trajectory(t, 'const')
     # trajectory = generate_trajectory(t, 'poly')  # polynomial trajectory
     # trajectory = generate_trajectory(t, 'triangle')  # triangle trajectory
 
@@ -52,6 +52,7 @@ def main():
 
     # Plot results
     plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt)
+
 
 if __name__ == '__main__':
     main()
