@@ -2,7 +2,6 @@ import numpy as np
 from utils.funkcje import generate_trajectory, PIDController, ADRCController, MassSpringDamper, plot_results,\
     calculate_quality_indices
 
-
 def main():
     # Configuration parameters
     dt = 0.01
@@ -10,7 +9,7 @@ def main():
     t = np.arange(0, simulation_time, dt)
 
     # Trajectory configuration
-    trajectory_type = 'sin'  # Options: 'sin', 'const', 'poly', 'triangle'
+    trajectory_type = 'const'  # Options: 'sin', 'const', 'poly', 'triangle'
     const_value = 1.0  # for 'const'
     poly_coefficients = [1, -2, 1]  # for 'poly'
     triangle_period = 2  # for 'triangle'
@@ -27,8 +26,8 @@ def main():
 
     # Changed system parameters
     change_time = 5.0
-    changed_mass = 20.0
-    changed_spring_constant = 3.0
+    changed_mass = 1.0
+    changed_spring_constant = 1.0
 
     # ==================================================================================================================
 
@@ -77,13 +76,14 @@ def main():
     IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc = calculate_quality_indices(t, trajectory, system_response_adrc)
 
     # Print quality indices
-    print(f'PID Controller Quality Indices:\n'
-          f'IAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
-    print(f'ADRC Controller Quality Indices:\n'
-          f'IAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
+    print(f'PID Controller Quality Indices:'
+          f'\nIAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
+    print(f'ADRC Controller Quality Indices:'
+          f'\nIAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
 
     # Plot results
-    plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt)
+    plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt, initial_mass,
+                 initial_spring_constant, initial_damping_coefficient, changed_mass, changed_spring_constant)
 
 
 if __name__ == '__main__':

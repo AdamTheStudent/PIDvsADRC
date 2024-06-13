@@ -91,8 +91,8 @@ class MassSpringDamper:
         self.velocity = 0
 
     def update(self, force, dt, current_time):
-        acceleration =\
-            (force - self.spring_constant * self.position - self.damping_coefficient * self.velocity) / self.mass
+        acceleration = (force - self.spring_constant * self.position
+                        - self.damping_coefficient * self.velocity) / self.mass
         self.velocity += acceleration * dt
         self.position += self.velocity * dt
         return self.position
@@ -107,7 +107,8 @@ def calculate_quality_indices(time, trajectory, response):
     return IAE, ITAE, ISE, ITSE
 
 
-def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt):
+def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt, initial_mass,
+                 initial_spring_constant, initial_damping_coefficient, changed_mass, changed_spring_constant):
     IAE_pid, ITAE_pid, ISE_pid, ITSE_pid = calculate_quality_indices(time, trajectory, system_response_pid)
     IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc = calculate_quality_indices(time, trajectory, system_response_adrc)
 
@@ -132,11 +133,12 @@ def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid,
     axs[2].set_xlabel('Time (s)')
     axs[2].set_ylabel('Position')
     axs[2].legend()
-    axs[2].text(0.02, 0.95, 'Initial Params:\nMass: 1.0\nSpring: 1.0\nDamping: 0.3', transform=axs[2].transAxes,
-                fontsize=9,
+    axs[2].text(0.02, 0.95,
+                f'Initial Params:\nMass: {initial_mass}\nSpring: {initial_spring_constant}\nDamping:'
+                f'{initial_damping_coefficient}', transform=axs[2].transAxes, fontsize=9,
                 verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
-    axs[2].text(0.75, 0.95, 'Changed Params (at t=5s):\nMass: 20.0\nSpring: 3.0', transform=axs[2].transAxes,
-                fontsize=9,
+    axs[2].text(0.75, 0.95, f'Changed Params (at t=5s):\nMass: {changed_mass}\nSpring: {changed_spring_constant}',
+                transform=axs[2].transAxes, fontsize=9,
                 verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
     quality_indices = ['IAE', 'ITAE', 'ISE', 'ITSE']
