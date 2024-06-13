@@ -77,14 +77,15 @@ def main():
     IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc = calculate_quality_indices(t, trajectory, system_response_adrc)
 
     # Print quality indices
-    print(f'PID Controller Quality Indices:'
-          f'\nIAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
-    print(f'ADRC Controller Quality Indices:'
-          f'\nIAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
+    print(f'PID Controller Quality Indices:\n'
+          f'IAE: {IAE_pid:.4f}, ITAE: {ITAE_pid:.4f}, ISE: {ISE_pid:.4f}, ITSE: {ITSE_pid:.4f}')
+    print(f'ADRC Controller Quality Indices:\n'
+          f'IAE: {IAE_adrc:.4f}, ITAE: {ITAE_adrc:.4f}, ISE: {ISE_adrc:.4f}, ITSE: {ITSE_adrc:.4f}')
 
     # Plot results
     plot_results(t, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt, initial_mass,
-                 initial_spring_constant, initial_damping_coefficient, changed_mass, changed_spring_constant)
+                 initial_spring_constant, initial_damping_coefficient, changed_mass, changed_spring_constant,
+                 pid_params, adrc_params, change_time)
 
 
 if __name__ == '__main__':

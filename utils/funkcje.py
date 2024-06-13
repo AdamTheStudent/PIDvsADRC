@@ -108,7 +108,8 @@ def calculate_quality_indices(time, trajectory, response):
 
 
 def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid, system_response_adrc, dt, initial_mass,
-                 initial_spring_constant, initial_damping_coefficient, changed_mass, changed_spring_constant):
+                 initial_spring_constant, initial_damping_coefficient, changed_mass, changed_spring_constant,
+                 pid_params, adrc_params, change_time):
     IAE_pid, ITAE_pid, ISE_pid, ITSE_pid = calculate_quality_indices(time, trajectory, system_response_pid)
     IAE_adrc, ITAE_adrc, ISE_adrc, ITSE_adrc = calculate_quality_indices(time, trajectory, system_response_adrc)
 
@@ -127,18 +128,29 @@ def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid,
     axs[1].set_ylabel('Control Signal')
     axs[1].legend()
 
+    pid_params_text = f'PID Params:\nKp: {pid_params["kp"]}\nKi: {pid_params["ki"]}\nKd: {pid_params["kd"]}'
+    adrc_params_text = f'ADRC Params:\nBeta1: {adrc_params["beta1"]}\n' \
+                       f'Beta2: {adrc_params["beta2"]}\nBeta3: {adrc_params["beta3"]}\n' \
+                       f'K1: {adrc_params["k1"]}\nK2: {adrc_params["k2"]}'
+    axs[1].text(0.02, 0.95, pid_params_text, transform=axs[1].transAxes, fontsize=9,
+                verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
+    axs[1].text(0.75, 0.95, adrc_params_text, transform=axs[1].transAxes, fontsize=9,
+                verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
+
     axs[2].plot(time, system_response_pid, label='System Response (PID)')
     axs[2].plot(time, system_response_adrc, label='System Response (ADRC)')
     axs[2].set_title('System Response')
     axs[2].set_xlabel('Time (s)')
     axs[2].set_ylabel('Position')
     axs[2].legend()
-    axs[2].text(0.02, 0.95,
-                f'Initial Params:\nMass: {initial_mass}\nSpring: {initial_spring_constant}\nDamping:'
-                f'{initial_damping_coefficient}', transform=axs[2].transAxes, fontsize=9,
+
+    initial_params_text = f'Initial Params:\nMass: {initial_mass}\nSpring: {initial_spring_constant}\n' \
+                          f'Damping: {initial_damping_coefficient}'
+    changed_params_text = f'Changed Params (at t={change_time}s):\nMass: {changed_mass}\n' \
+                          f'Spring: {changed_spring_constant}'
+    axs[2].text(0.02, 0.95, initial_params_text, transform=axs[2].transAxes, fontsize=9,
                 verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
-    axs[2].text(0.75, 0.95, f'Changed Params (at t=5s):\nMass: {changed_mass}\nSpring: {changed_spring_constant}',
-                transform=axs[2].transAxes, fontsize=9,
+    axs[2].text(0.75, 0.95, changed_params_text, transform=axs[2].transAxes, fontsize=9,
                 verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
 
     quality_indices = ['IAE', 'ITAE', 'ISE', 'ITSE']
