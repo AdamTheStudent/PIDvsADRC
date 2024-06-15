@@ -10,7 +10,7 @@ def main():
     t = np.arange(0, simulation_time, dt)
 
     # Trajectory configuration
-    trajectory_type = 'triangle'  # Options: 'sin', 'const', 'poly', 'triangle'
+    trajectory_type = 'sin'  # Options: 'sin', 'const', 'poly', 'triangle'
     const_value = 2.0  # for 'const'
     poly_coefficients = [1, -3, 1]  # for 'poly'
     triangle_period = 2  # for 'triangle'
