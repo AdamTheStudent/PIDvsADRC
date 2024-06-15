@@ -7,7 +7,9 @@ def generate_trajectory(t, option, const_value=1.0, poly_coefficients=[1, -2, 1]
     if option == 'sin':
         return np.sin(t)
     elif option == 'const':
-        return np.full_like(t, const_value)
+        x = np.full_like(t, const_value)
+        x[0:2] = 0
+        return x
     elif option == 'poly':
         trajectory = np.zeros_like(t)
         n = len(poly_coefficients) - 1
@@ -29,8 +31,8 @@ class PIDController:
         self.kd = kd
         self.integral = 0
         self.previous_error = 0
-        self.min = -10
-        self.max = 10
+        self.min = -20
+        self.max = 20
 
     def calculate(self, setpoint, measured_value, dt):
         error = setpoint - measured_value
@@ -68,8 +70,8 @@ class ADRCController:
         self.eso = ESO(beta1, beta2, beta3, dt)
         self.k1 = k1
         self.k2 = k2
-        self.min = -10
-        self.max = 10
+        self.min = -20
+        self.max = 20
 
     def calculate(self, setpoint, measured_value, dt):
         x1_hat, x2_hat, x3_hat = self.eso.update(measured_value)
@@ -89,11 +91,19 @@ class MassSpringDamper:
         self.damping_coefficient = damping_coefficient
         self.position = 0
         self.velocity = 0
+        self.noise = 0
 
     def update(self, force, dt, current_time):
+        if current_time>5.0:
+            self.mass = 1.0
+            self.spring_constant = 1.3
+            self.damping_coefficient = 1.5 *10
+        if current_time> 10.0:
+            self.noise = np.random.normal(0, 0.5)
+
         acceleration = (force - self.spring_constant * self.position
                         - self.damping_coefficient * self.velocity) / self.mass
-        self.velocity += acceleration * dt
+        self.velocity += (acceleration+self.noise) * dt
         self.position += self.velocity * dt
         return self.position
 
@@ -152,6 +162,7 @@ def plot_results(time, trajectory, pid_output, adrc_output, system_response_pid,
                 verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
     axs[2].text(0.75, 0.95, changed_params_text, transform=axs[2].transAxes, fontsize=9,
                 verticalalignment='top', bbox=dict(boxstyle='round', facecolor='white', alpha=0.5))
+    axs[2].plot(time, trajectory, '--', label='Desired Trajectory')
 
     quality_indices = ['IAE', 'ITAE', 'ISE', 'ITSE']
     pid_indices = [IAE_pid, ITAE_pid, ISE_pid, ITSE_pid]

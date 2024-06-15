@@ -6,18 +6,18 @@ from utils.funkcje import generate_trajectory, PIDController, ADRCController, Ma
 def main():
     # Configuration parameters
     dt = 0.01
-    simulation_time = 10
+    simulation_time = 15
     t = np.arange(0, simulation_time, dt)
 
     # Trajectory configuration
-    trajectory_type = 'const'  # Options: 'sin', 'const', 'poly', 'triangle'
-    const_value = 1.0  # for 'const'
-    poly_coefficients = [1, -2, 1]  # for 'poly'
+    trajectory_type = 'triangle'  # Options: 'sin', 'const', 'poly', 'triangle'
+    const_value = 2.0  # for 'const'
+    poly_coefficients = [1, -3, 1]  # for 'poly'
     triangle_period = 2  # for 'triangle'
     triangle_amplitude = 1  # for 'triangle'
 
     # Controller parameters
-    pid_params = {'kp': 5.0, 'ki': 1.5, 'kd': 0.5}
+    pid_params = {'kp': 40.0, 'ki': 0., 'kd': 10.5}
     adrc_params = {'beta1': 30, 'beta2': 300, 'beta3': 1000, 'k1': 50, 'k2': 2, 'dt': dt}
 
     # Initial system parameters
